@@ -33,57 +33,83 @@ int n = 0;
 int m = 0;
 int h = 0;
 
+
+const int buttonMin  = 2;
+const int buttonHour = 3;
+
+int buttonMinState  = 0;
+int buttonHourState = 0;
+
 LiquidCrystal_I2C  lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
-void setup()
-{
- lcd.begin (16,2); //  <<----- My LCD was 16x2
+void setup() {
 
- 
-// Switch on the backlight
-lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
-lcd.setBacklight(HIGH);
-lcd.home (); // go home
-
- lcd.print("KD0PBZ-Ctl");  
+  pinMode(buttonMin,  INPUT);
+  pinMode(buttonHour, INPUT);
+  
+  lcd.begin (16,2); //  <<----- My LCD was 16x2
+  // Switch on the backlight
+  lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
+  lcd.setBacklight(HIGH);
+  lcd.home (); // go home
+  lcd.print("KD0PBZ-Ctl");
 }
 
-void loop()
-{
- // Backlight on/off every 3 seconds
+void loop(){
+
+ buttonMinState  = digitalRead(buttonMin);
+ buttonHourState = digitalRead(buttonHour);
+
+ if(buttonMinState == HIGH){
+  m++;
+  buttonMinState = 0;
+  //goto top;
+ }
+
+ if(buttonHourState == HIGH){
+  h++;
+  buttonHourState = 0;
+  //goto top;
+ }
+
  lcd.setCursor (0,1);        // go to start of 2nd line
  
- if(h < 9){
+ if(h < 10){
   lcd.print(0,DEC);
  }
  lcd.print(h,DEC);
- lcd.print(":");
  
- if(m < 9){
+ lcd.print(":");
+  
+ if(m < 10){
   lcd.print(0,DEC);
  }
  lcd.print(m,DEC);
+
  lcd.print(":");
+
+ 
  if(n < 9){
  lcd.print(0,DEC); 
  }
  lcd.print(n,DEC);
- n++;
+ 
 
+  //Counting Mins
   if(n >= 60){
     m++;
     n = 0;
   }
- 
+
+  //Counting Hours
   if(m >= 59){
     h++;
-    h = 0;
+    m = 0;
   }
 
+  // Wait 1 Second this is the resloution of our clock
+  n++;
   delay(1000);
-
-  //lcd.setBacklight(LOW);      // Backlight off
-  //lcd.setBacklight(HIGH);     // Backlight on
 
 }
 
